@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import cluster from "cluster";
+import { fork } from "node:child_process";
 import os from "node:os";
 const numCPUs = os.cpus().length;
 
@@ -38,24 +38,6 @@ const download = async (character) => {
     }
 
     console.log(`${character.name} Sticker Pack downloaded`);
-  }
-};
-
-const init = (characterSet) => {
-  if (cluster.isPrimary) {
-    console.log(`Primary ${process.pid} is running`);
-
-    // Fork workers.
-    for (let i = 0; i < numCPUs; i++) {
-      let worker = cluster.fork();
-
-      worker.on("message", function (message) {
-        // download(message.character);
-        console.log(message.character);
-      });
-    }
-  } else {
-    console.log(`Worker ${process.pid} started`);
   }
 };
 

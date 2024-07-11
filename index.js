@@ -1,34 +1,30 @@
 import fs from "node:fs/promises";
 import readline from "readline";
 
+import chalk from "chalk";
 import puppeteer from "puppeteer-core";
 
+import cliSpinners from "cli-spinners";
+import ora from "ora";
+
 import characterList from "./characterList.js";
-
-const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
-const askQuestion = (query) => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  return new Promise((resolve) =>
-    rl.question(query, (ans) => {
-      rl.close();
-      resolve(ans);
-    })
-  );
-};
+import { download } from "./parent-download.js";
+import { sleep } from "./utils.js";
 
 let browser;
+
+let browserLaunchSpinner, fetchPostSpinner, fetchImageSpinner, downloadSpinner;
+
 try {
   // const browserURL = "http://127.0.0.1:9223";
   // const browser = await puppeteer.connect({
   //   browserURL,
   // });
+
+  browserLaunchSpinner = ora({
+    text: chalk.yellow("Launching browser..."),
+    spinner: cliSpinners.circleHalves,
+  }).start();
 
   // Launch the browser and open a new blank page
   browser = await puppeteer.launch({
@@ -36,10 +32,17 @@ try {
     ignoreDefaultArgs: ["--disable-extensions"],
     executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
     args: [
-      "--user-data-dir=C:/Users/jerry/AppData/Local/Google/Chrome/User Data",
-      "--profile-directory=Default",
+      "--user-data-dir=C:/Users/JerryOr.LR1907325/AppData/Local/Google/Chrome/User Data",
+      "--profile-directory=Profile 1",
     ],
   });
+
+  browserLaunchSpinner.succeed(chalk.green("Launching browser..."));
+
+  fetchPostSpinner = ora({
+    text: chalk.yellow("Fetching post's url..."),
+    spinner: cliSpinners.circleHalves,
+  }).start();
 
   const domain = "https://nga.178.com";
 
@@ -65,6 +68,8 @@ try {
 
   const pageList = await browser.pages();
   const page2 = pageList[2];
+
+  await sleep(2000);
   page2.bringToFront();
 
   const postList = [];
@@ -107,7 +112,7 @@ try {
     postList.push(...data);
   }
 
-  console.log("Post URL fetched");
+  fetchPostSpinner.succeed(chalk.green("Fetching post's url..."));
 
   const photoListToDownload = [];
 
@@ -119,7 +124,6 @@ try {
     const photoList = Array.from(
       document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
     );
-    console.log(photoList);
 
     return photoList
       .map((photo) => photo.getAttribute("data-srclazy"))
@@ -142,46 +146,62 @@ try {
     photoUrlList: photos,
   });
 
-  for (const post of postList) {
-    if (!post) {
-      continue;
-    }
+  fetchImageSpinner = ora({
+    text: chalk.yellow("Fetching image's url..."),
+    spinner: cliSpinners.circleHalves,
+  }).start();
 
-    await page2.goto(post.url);
-    await page2.waitForSelector("#post1strow0");
+  // for (const post of postList) {
+  //   if (!post) {
+  //     continue;
+  //   }
 
-    const photos = await page2.evaluate(() => {
-      const photoList = Array.from(
-        document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
-      );
-      console.log(photoList);
+  //   await page2.goto(post.url);
+  //   await page2.waitForSelector("#post1strow0");
 
-      return photoList
-        .map((photo) => photo.getAttribute("data-srclazy"))
-        .filter((photoUrl) => {
-          return !(!photoUrl || photoUrl === "" || photoUrl === null);
-        });
-    });
+  //   const photos = await page2.evaluate(() => {
+  //     const photoList = Array.from(
+  //       document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
+  //     );
+  //     console.log(photoList);
 
-    let characterName = post.title;
+  //     return photoList
+  //       .map((photo) => photo.getAttribute("data-srcorg"))
+  //       .filter((photoUrl) => {
+  //         return !(!photoUrl || photoUrl === "" || photoUrl === null);
+  //       });
+  //   });
 
-    for (const name of characterList) {
-      if (post.title.includes(name)) {
-        characterName = name;
-        break;
-      }
-    }
+  //   let characterName = post.title;
 
-    photoListToDownload.push({
-      name: characterName,
-      photoUrlList: photos,
-    });
-  }
+  //   let characterIncluded = false;
 
-  // Close the Page
-  await askQuestion("Press Enter to close the browser");
+  //   for (const name of characterList) {
+  //     if (post.title.includes(name)) {
+  //       characterName = name;
+  //       characterIncluded = true;
+  //       break;
+  //     }
+  //   }
+
+  //   if (characterIncluded) {
+  //     photoListToDownload.push({
+  //       name: characterName,
+  //       photoUrlList: photos,
+  //     });
+  //   }
+  // }
+
+  fetchImageSpinner.succeed(chalk.green("Fetching image's url..."));
+
   await browser.close();
+
+  console.log(chalk.yellow("Downloading Image..."));
+
+  await download(photoListToDownload);
 } catch (e) {
-  console.log(`Error due to ${e}`);
+  console.log(` > ${chalk.redBright(`Error due to ${e.toString()}`)}`);
   await browser.close();
+
+  process.exit();
 }
