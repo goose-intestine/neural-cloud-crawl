@@ -68,8 +68,6 @@ try {
 
   const pageList = await browser.pages();
   const page2 = pageList[2];
-
-  await sleep(2000);
   page2.bringToFront();
 
   const postList = [];
@@ -196,12 +194,15 @@ try {
 
   await browser.close();
 
+  console.log(photoListToDownload);
+  process.exit();
+
   console.log(chalk.yellow("Downloading Image..."));
 
   await download(photoListToDownload);
+
+  process.exit();
 } catch (e) {
   console.log(` > ${chalk.redBright(`Error due to ${e.toString()}`)}`);
   await browser.close();
-
-  process.exit();
 }

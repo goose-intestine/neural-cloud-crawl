@@ -61,8 +61,9 @@ const download = async (characterList) => {
       return;
     });
 
-    forked.send({ character: characterList[index], index });
-    index++;
+    // while (resultList.includes(false)) {
+    //   continue;
+    // }
   }
 
   while (resultList.includes(false)) {

@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import { sleep } from "./utils.js";
 
 let character;
 let index;
@@ -39,4 +38,7 @@ process.on("message", async (payload) => {
   }
 });
 
-process.send({ type: "handshake", pid: process.pid });
+if (process.send) {
+  process.send({ type: "handshake", pid: process.pid });
+}
+
