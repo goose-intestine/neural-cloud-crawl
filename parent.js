@@ -7,13 +7,13 @@ import { download } from "./parent-download.js";
 
 const numCPUs = os.cpus().length;
 
-const forked = fork("child-download.js");
+const forked = fork("child.js");
 
-// forked.on("message", (msg) => {
-//   console.log("Message from child", msg);
-// });
+forked.on("message", (msg) => {
+  console.log("Message from child", msg);
+});
 
-// forked.send({ hello: "world" });
+forked.send({ hello: "world" });
 
 const data = [
   {
@@ -30,5 +30,5 @@ const data = [
   },
 ];
 
-await download(data);
+// await download(data);
 

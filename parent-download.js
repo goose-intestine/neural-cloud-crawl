@@ -32,10 +32,11 @@ const download = async (characterList) => {
       break;
     }
 
-    const forked = fork("child-download.js");
+    const forked = fork("child-download.cjs");
 
     forked.on("message", (msg) => {
       console.log(msg);
+
       if (msg.type === "handshake") {
         forked.send({
           pid: msg.pid,
@@ -51,19 +52,17 @@ const download = async (characterList) => {
         return;
       }
 
-      if (!resultList.includes(false)) {
-        forked.kill();
-        return;
-      }
-
       forked.send({ pid: msg.pid, character: characterList[index], index });
       index++;
       return;
     });
 
-    // while (resultList.includes(false)) {
-    //   continue;
-    // }
+    const checkResultList = setInterval(() => {
+      if (!resultList.includes(false)) {
+        clearInterval(checkResultList);
+        forked.kill();
+      }
+    }, 500);
   }
 
   while (resultList.includes(false)) {
@@ -78,4 +77,3 @@ const download = async (characterList) => {
 };
 
 export { download };
-
