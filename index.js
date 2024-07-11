@@ -6,6 +6,7 @@ import puppeteer from "puppeteer-core";
 
 import cliSpinners from "cli-spinners";
 import ora from "ora";
+import "dotenv/config";
 
 import characterList from "./characterList.js";
 import { download } from "./parent-download.js";
@@ -30,10 +31,10 @@ try {
   browser = await puppeteer.launch({
     headless: false,
     ignoreDefaultArgs: ["--disable-extensions"],
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    executablePath: `${process.env.CHROME_PATH}`,
     args: [
-      "--user-data-dir=C:/Users/JerryOr.LR1907325/AppData/Local/Google/Chrome/User Data",
-      "--profile-directory=Profile 1",
+      `--user-data-dir=${process.env.PROFILE_PATH}`,
+      `--profile-directory=${process.env.PROFILE_NAME}`,
     ],
   });
 
