@@ -32,7 +32,7 @@ const download = async (characterList) => {
       break;
     }
 
-    const forked = fork("child-download.cjs");
+    const forked = fork("child-download.js");
 
     forked.on("message", (msg) => {
       console.log(msg);
@@ -44,6 +44,11 @@ const download = async (characterList) => {
           index,
         });
         index++;
+        return;
+      }
+
+      if (msg.type === "progress") {
+        barList[msg.index].increment();
         return;
       }
 
@@ -65,15 +70,15 @@ const download = async (characterList) => {
     }, 500);
   }
 
-  while (resultList.includes(false)) {
-    continue;
+  if (!resultList.includes(false)) {
+    multibar.stop();
+
+    console.log("Download complete.");
+
+    process.exit();
   }
 
-  multibar.stop();
-
-  console.log("Download complete.");
-
-  process.exit();
+  return;
 };
 
 export { download };

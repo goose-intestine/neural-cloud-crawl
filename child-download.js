@@ -23,6 +23,14 @@ const download = async (character) => {
       photoUrl,
       `./images/${character.name}/${photoUrl.split("/").pop()}`
     );
+
+    process.send({
+      type: "progress",
+      pid: process.pid,
+      character,
+      index,
+      completed: true,
+    });
   }
   process.send({ pid: process.pid, character, index, completed: true });
 };
@@ -41,4 +49,3 @@ process.on("message", async (payload) => {
 if (process.send) {
   process.send({ type: "handshake", pid: process.pid });
 }
-

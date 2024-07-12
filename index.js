@@ -115,87 +115,85 @@ try {
 
   const photoListToDownload = [];
 
-  const post = postList[0];
-  await page2.goto(post.url);
-  await page2.waitForSelector("#post1strow0");
+  // const post = postList[0];
+  // await page2.goto(post.url);
+  // await page2.waitForSelector("#post1strow0");
 
-  const photos = await page2.evaluate(() => {
-    const photoList = Array.from(
-      document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
-    );
+  // const photos = await page2.evaluate(() => {
+  //   const photoList = Array.from(
+  //     document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
+  //   );
 
-    return photoList
-      .map((photo) => photo.getAttribute("data-srclazy"))
-      .filter((photoUrl) => {
-        return !(!photoUrl || photoUrl === "" || photoUrl === null);
-      });
-  });
+  //   return photoList
+  //     .map((photo) => photo.getAttribute("data-srclazy"))
+  //     .filter((photoUrl) => {
+  //       return !(!photoUrl || photoUrl === "" || photoUrl === null);
+  //     });
+  // });
 
-  let characterName = post.title;
+  // let characterName = post.title;
 
-  for (const name of characterList) {
-    if (post.title.includes(name)) {
-      characterName = name;
-      break;
-    }
-  }
+  // for (const name of characterList) {
+  //   if (post.title.includes(name)) {
+  //     characterName = name;
+  //     break;
+  //   }
+  // }
 
-  photoListToDownload.push({
-    name: characterName,
-    photoUrlList: photos,
-  });
+  // photoListToDownload.push({
+  //   name: characterName,
+  //   photoUrlList: photos,
+  // });
 
   fetchImageSpinner = ora({
     text: chalk.yellow("Fetching image's url..."),
     spinner: cliSpinners.circleHalves,
   }).start();
 
-  // for (const post of postList) {
-  //   if (!post) {
-  //     continue;
-  //   }
+  for (const post of postList) {
+    if (!post) {
+      continue;
+    }
 
-  //   await page2.goto(post.url);
-  //   await page2.waitForSelector("#post1strow0");
+    await page2.goto(post.url);
+    await page2.waitForSelector("#post1strow0");
 
-  //   const photos = await page2.evaluate(() => {
-  //     const photoList = Array.from(
-  //       document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
-  //     );
-  //     console.log(photoList);
+    const photos = await page2.evaluate(() => {
+      const photoList = Array.from(
+        document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
+      );
+      console.log(photoList);
 
-  //     return photoList
-  //       .map((photo) => photo.getAttribute("data-srcorg"))
-  //       .filter((photoUrl) => {
-  //         return !(!photoUrl || photoUrl === "" || photoUrl === null);
-  //       });
-  //   });
+      return photoList
+        .map((photo) => photo.getAttribute("data-srcorg"))
+        .filter((photoUrl) => {
+          return !(!photoUrl || photoUrl === "" || photoUrl === null);
+        });
+    });
 
-  //   let characterName = post.title;
+    let characterName = post.title;
 
-  //   let characterIncluded = false;
+    let characterIncluded = false;
 
-  //   for (const name of characterList) {
-  //     if (post.title.includes(name)) {
-  //       characterName = name;
-  //       characterIncluded = true;
-  //       break;
-  //     }
-  //   }
+    for (const name of characterList) {
+      if (post.title.includes(name)) {
+        characterName = name;
+        characterIncluded = true;
+        break;
+      }
+    }
 
-  //   if (characterIncluded) {
-  //     photoListToDownload.push({
-  //       name: characterName,
-  //       photoUrlList: photos,
-  //     });
-  //   }
-  // }
+    if (characterIncluded) {
+      photoListToDownload.push({
+        name: characterName,
+        photoUrlList: photos,
+      });
+    }
+  }
 
   fetchImageSpinner.succeed(chalk.green("Fetching image's url..."));
 
   await browser.close();
-
-  console.log(photoListToDownload);
 
   console.log(chalk.yellow("Downloading Image..."));
 
