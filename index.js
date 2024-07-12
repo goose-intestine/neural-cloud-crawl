@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import readline from "readline";
 
 import chalk from "chalk";
 import puppeteer from "puppeteer-core";
@@ -14,7 +13,9 @@ import { sleep } from "./utils.js";
 
 let browser;
 
-let browserLaunchSpinner, fetchPostSpinner, fetchImageSpinner, downloadSpinner;
+let browserLaunchSpinner, fetchPostSpinner, fetchImageSpinner;
+
+const searchKeyword = "表情包";
 
 try {
   // const browserURL = "http://127.0.0.1:9223";
@@ -62,7 +63,7 @@ try {
     "#mainmenu > div > div > div.right > div:nth-child(4) > span > input"
   );
 
-  await searchInput.type("表情包");
+  await searchInput.type(searchKeyword);
   await page1.keyboard.press("Enter");
 
   await sleep(2000);
@@ -195,12 +196,16 @@ try {
 
   await browser.close();
 
-  console.log(chalk.yellow("Downloading Image..."));
+  await fs.writeFile(
+    `${searchKeyword}.txt`,
+    JSON.stringify(photoListToDownload),
+    { encoding: "utf-8" }
+  );
 
-  await download(photoListToDownload);
+  await download(searchKeyword);
 } catch (e) {
-  console.log(` > ${chalk.redBright(`Error due to ${e.toString()}`)}`);
+  console.log(` > ${chalk.redBright(`Error due to ${e} ${e.stack}`)}`);
   await browser.close();
 }
 
-process.exit();
+// process.exit();

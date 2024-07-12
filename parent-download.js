@@ -2,6 +2,7 @@ import { fork } from "node:child_process";
 import os from "node:os";
 import fs from "node:fs/promises";
 
+import chalk from "chalk";
 import cliProgress from "cli-progress";
 
 const numCPUs = os.cpus().length;
@@ -11,36 +12,71 @@ const multibar = new cliProgress.MultiBar(
   {
     clearOnComplete: false,
     hideCursor: true,
-    format: " {bar} | {name} | {value}/{total}",
+    format: `${chalk.blueBright("{bar}")} | {name} | ${chalk.yellow(
+      "{value}"
+    )}/{total}`,
   },
   cliProgress.Presets.rect
 );
 
-const download = async (characterList) => {
+const download = async (keyword) => {
+  console.log(chalk.yellow("Downloading Image..."));
+
   let index = 0;
 
-  const resultList = new Array(characterList.length).fill(false);
+  const entityListContent = await fs.readFile(`${keyword}.txt`, {
+    encoding: "utf-8",
+  });
+
+  const entityList = JSON.parse(entityListContent);
+
+  const resultList = new Array(entityList.length).fill(false);
 
   try {
-    await fs.access("./images");
+    await fs.access(`./image`);
   } catch (e) {
-    await fs.mkdir("./images");
+    await fs.mkdir(`./image`);
+  }
+
+  try {
+    await fs.access(`./image/${keyword}`);
+  } catch (e) {
+    await fs.mkdir(`./image/${keyword}`);
+  }
+
+  const barList = [];
+  const barIndexMap = [];
+
+  for (let i = 0; i < numCPUs; i++) {
+    barList.push(
+      multibar.create(entityList[i].photoUrlList.length, 0, {
+        name: entityList[i].name,
+      })
+    );
+
+    barIndexMap[i] = i;
   }
 
   for (let i = 0; i < numCPUs; i++) {
-    if (i >= characterList.length) {
+    if (i >= entityList.length) {
       break;
     }
 
     const forked = fork("child-download.js");
 
     forked.on("message", (msg) => {
-      console.log(msg);
+      let barIndex;
+
+      if (Object.prototype.hasOwnProperty.call(msg, "index")) {
+        barIndex = barIndexMap.indexOf(msg.index);
+      }
 
       if (msg.type === "handshake") {
+        barIndex = barIndexMap.indexOf(index);
         forked.send({
+          keyword: keyword,
           pid: msg.pid,
-          character: characterList[index],
+          entity: entityList[index],
           index,
         });
         index++;
@@ -48,35 +84,42 @@ const download = async (characterList) => {
       }
 
       if (msg.type === "progress") {
-        barList[msg.index].increment();
+        barList[barIndex].increment();
         return;
       }
 
       if (msg.completed) {
-        resultList[index] = true;
-        return;
+        resultList[msg.index] = true;
+
+        if (index >= entityList.length) {
+          return;
+        }
+        barList[barIndex].update(0, {
+          total: entityList[index].photoUrlList.length,
+          name: entityList[index].name,
+        });
+        barIndexMap[barIndex] = index;
       }
 
-      forked.send({ pid: msg.pid, character: characterList[index], index });
+      forked.send({ pid: msg.pid, entity: entityList[index], index });
       index++;
       return;
     });
 
-    const checkResultList = setInterval(() => {
-      if (!resultList.includes(false)) {
-        clearInterval(checkResultList);
-        forked.kill();
-      }
-    }, 500);
+    if (!resultList.includes(false)) {
+      forked.kill();
+    }
   }
+  const checkResultList = setInterval(() => {
+    if (!resultList.includes(false)) {
+      console.log(chalk.yellow("\nDownload complete."));
 
-  if (!resultList.includes(false)) {
-    multibar.stop();
+      multibar.stop();
+      clearInterval(checkResultList);
 
-    console.log("Download complete.");
-
-    process.exit();
-  }
+      process.exit();
+    }
+  }, 500);
 
   return;
 };

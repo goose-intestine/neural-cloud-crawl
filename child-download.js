@@ -1,7 +1,9 @@
 import fs from "node:fs/promises";
 
-let character;
+let entity;
 let index;
+
+let keyword;
 
 const downloadFile = async (url, path) => {
   const response = await fetch(url);
@@ -11,41 +13,47 @@ const downloadFile = async (url, path) => {
   await fs.writeFile(path, buffer);
 };
 
-const download = async (character) => {
+const download = async (entity) => {
   try {
-    await fs.access(`./images/${character.name}`);
+    await fs.access(`./image/${keyword}/${entity.name}`);
   } catch (e) {
-    await fs.mkdir(`./images/${character.name}`);
+    await fs.mkdir(`./image/${keyword}/${entity.name}`);
   }
 
-  for (const [photoIndex, photoUrl] of character.photoUrlList.entries()) {
+  for (const photoUrl of entity.photoUrlList) {
     await downloadFile(
       photoUrl,
-      `./images/${character.name}/${photoUrl.split("/").pop()}`
+      `./image/${keyword}/${entity.name}/${photoUrl.split("/").pop()}`
     );
 
     process.send({
       type: "progress",
       pid: process.pid,
-      character,
+      entity,
       index,
       completed: true,
     });
   }
-  process.send({ pid: process.pid, character, index, completed: true });
+  process.send({ pid: process.pid, entity, index, completed: true });
 };
 
 process.on("message", async (payload) => {
-  if (!payload.pid === process.pid && character) {
+  if (payload.pid !== process.pid && entity) {
     return;
   }
-  if (payload.character) {
-    character = payload.character;
+
+  if (payload.keyword) {
+    keyword = payload.keyword;
+  }
+
+  if (payload.entity) {
+    entity = payload.entity;
     index = payload.index;
-    await download(character);
+    await download(entity);
   }
 });
 
 if (process.send) {
   process.send({ type: "handshake", pid: process.pid });
 }
+
