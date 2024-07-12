@@ -20,10 +20,12 @@ const download = async (entity) => {
     await fs.mkdir(`./image/${keyword}/${entity.name}`);
   }
 
-  for (const photoUrl of entity.photoUrlList) {
+  for (const [photoIndex, photoUrl] of entity.photoUrlList.entries()) {
     await downloadFile(
       photoUrl,
-      `./image/${keyword}/${entity.name}/${photoUrl.split("/").pop()}`
+      `./image/${keyword}/${entity.name}/${
+        entity.name
+      }-${photoIndex}.${photoUrl.slice(-3)}`
     );
 
     process.send({
