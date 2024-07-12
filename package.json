@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "sticker": "node sticker.js",
+    "wallpaper": "node wallpaper.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
