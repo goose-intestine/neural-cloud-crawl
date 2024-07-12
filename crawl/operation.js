@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 import path, { dirname } from "node:path";
 
 import puppeteer from "puppeteer-core";
-import "dotenv/config";
+
+import { DefaultValues } from "../defaultValues.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,13 +15,12 @@ let browser;
 browser = await puppeteer.launch({
   headless: true,
   ignoreDefaultArgs: ["--disable-extensions"],
-  executablePath: `${process.env.CHROME_PATH}`,
+  executablePath: `${DefaultValues.chromePath}`,
   args: [
-    `--user-data-dir=${process.env.PROFILE_PATH}`,
-    `--profile-directory=${process.env.PROFILE_NAME}`,
+    `--user-data-dir=${DefaultValues.profilePath}`,
+    `--profile-directory=${DefaultValues.profileName}`,
   ],
 });
-
 const page1 = await browser.newPage();
 
 await page1.setViewport({ width: 800, height: 800 });
