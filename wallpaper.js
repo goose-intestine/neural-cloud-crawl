@@ -101,7 +101,7 @@ try {
           title: link.textContent
             .replace("[微博拌匀]", "")
             .replace("[云图计划]", "")
-            .replace("现在为您", "")
+            .replace("现在为您带来", "")
             .replace(/[/\\?%*:|"<>]/g, ""),
           url: link.getAttribute("href"),
         };

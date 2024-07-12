@@ -163,7 +163,6 @@ try {
       const photoList = Array.from(
         document.querySelectorAll("#post1strow0 > td.c2 > span > p > img")
       );
-      console.log(photoList);
 
       return photoList
         .map((photo) => photo.getAttribute("data-srcorg"))

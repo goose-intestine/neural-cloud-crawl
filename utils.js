@@ -1,3 +1,5 @@
+import readline from "readline";
+
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -17,3 +19,4 @@ const askQuestion = (query) => {
 };
 
 export { sleep, askQuestion };
+
