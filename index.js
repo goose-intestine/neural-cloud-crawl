@@ -207,5 +207,3 @@ try {
   console.log(` > ${chalk.redBright(`Error due to ${e} ${e.stack}`)}`);
   await browser.close();
 }
-
-// process.exit();
