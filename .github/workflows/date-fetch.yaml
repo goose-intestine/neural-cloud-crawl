@@ -1,0 +1,49 @@
+name: Neural Cloud Wiki - Data Crawling
+
+on: 
+  push:
+  schedule:
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Crawling resources
+        run: |
+          node ./crawling/character.js
+          node ./crawling/event.js
+
+      - name: Archive crawled outputs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Crawled Files
+          retention-days: 14
+          path: resources/*
+
+      - name: Update resources
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: |
+            resources/*
+          commit-msg: Update resources
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+            
+            
+          
+        
+      
