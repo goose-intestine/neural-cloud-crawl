@@ -7,9 +7,9 @@ import cliSpinners from "cli-spinners";
 import ora from "ora";
 import "dotenv/config";
 
-import characterList from "./characterList.js";
-import { download } from "./parent-download.js";
-import { sleep } from "./utils.js";
+import characterList from "../resources/character.json";
+import { download } from "../parent-download.js";
+import { sleep } from "../utils.js";
 
 let browser;
 
@@ -175,9 +175,9 @@ try {
 
     let characterIncluded = false;
 
-    for (const name of characterList) {
-      if (post.title.includes(name)) {
-        characterName = name;
+    for (const character of characterList) {
+      if (post.title.includes(character.name)) {
+        characterName = character.name;
         characterIncluded = true;
         break;
       }
