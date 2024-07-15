@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "sticker": "node ./crawl/sticker.js",
-    "character": "node ./crawl/character.js",
-    "event": "node ./crawl/event.js",
+    "sticker": "node ./crawling/sticker.js",
+    "character": "node ./crawling/character.js",
+    "event": "node ./crawling/event.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
