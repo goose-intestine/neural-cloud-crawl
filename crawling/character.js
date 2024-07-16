@@ -2,7 +2,8 @@ import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path, { dirname } from "node:path";
 
-import puppeteer from "puppeteer-core";
+// import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 
 import { DefaultValues } from "../defaultValues.js";
 
@@ -12,14 +13,19 @@ const __dirname = dirname(__filename);
 let browser;
 
 // Launch the browser and open a new blank page
+// browser = await puppeteer.launch({
+//   headless: true,
+//   ignoreDefaultArgs: ["--disable-extensions"],
+//   executablePath: `${DefaultValues.chromePath}`,
+//   args: [
+//     `--user-data-dir=${DefaultValues.profilePath}`,
+//     `--profile-directory=${DefaultValues.profileName}`,
+//   ],
+// });
+
 browser = await puppeteer.launch({
-  headless: true,
+  headless: false,
   ignoreDefaultArgs: ["--disable-extensions"],
-  executablePath: `${DefaultValues.chromePath}`,
-  args: [
-    `--user-data-dir=${DefaultValues.profilePath}`,
-    `--profile-directory=${DefaultValues.profileName}`,
-  ],
 });
 
 const page1 = await browser.newPage();
