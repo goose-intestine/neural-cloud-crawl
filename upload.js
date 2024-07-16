@@ -9,6 +9,7 @@ const octokit = new Octokit({
   auth: DefaultValues.githubToken,
 });
 
+// TODO: use oca, cli-progress & cli-spinner make it fansy!
 // TODO: upload by child_process
 const upload = async (keyword) => {
   const filePath = `./images/${keyword}/`;
