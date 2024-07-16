@@ -15,8 +15,6 @@ const upload = async (keyword) => {
 
   const subFiles = await fs.readdir(filePath);
 
-  console.log(files);
-
   for (const subFile of subFiles) {
     const subFilePath = `${filePath}/${subFile}`;
 
@@ -25,35 +23,35 @@ const upload = async (keyword) => {
     for (const image of images) {
       const imagePath = `${subFilePath}/${image}`;
 
-      await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-        owner: "goose-intestine",
-        repo: "neural-cloud-crawl",
-        path: "images",
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-          accept: "application/vnd.github.object+json",
-        },
-        ref: "gh-pages",
-      });
+      try {
+        await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+          owner: "goose-intestine",
+          repo: "neural-cloud-crawl",
+          path: `images/${keyword}/${subFile}/${image}`,
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+            accept: "application/vnd.github.object+json",
+          },
+          ref: "gh-pages",
+        });
+      } catch (e) {
+        const imageFile = await fs.readFile(imagePath);
+
+        await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
+          owner: "goose-intestine",
+          repo: "neural-cloud-crawl",
+          path: `images/${keyword}/${subFile}/${image}`,
+          message: "Upload image",
+          content: imageFile.toString("base64"),
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+            accept: "application/vnd.github.object+json",
+          },
+          ref: "gh-pages",
+        });
+      }
     }
   }
-
-  // for (const file of files) {
-  //   const filePath = stickerPath + file;
-
-  //   const image = await fs.readFile(filePath);
-
-  //   await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-  //     owner: "goose-intestine",
-  //     repo: "neural-cloud-crawl",
-  //     path: `resources/character/${keyword}/${file}`,
-  //     message: "Upload character image",
-  //     content: image.toString("base64"),
-  //   });
-
-  //   await sleep(1000);
-  // }
 };
 
 await upload("表情包");
-
