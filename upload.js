@@ -27,7 +27,7 @@ const upload = async (keyword) => {
         await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
           owner: "goose-intestine",
           repo: "neural-cloud-crawl",
-          path: `images/${keyword}/${subFile}/${image}`,
+          path: `image/${keyword}/${subFile}/${image}`,
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",
             accept: "application/vnd.github.object+json",
@@ -40,7 +40,7 @@ const upload = async (keyword) => {
         await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
           owner: "goose-intestine",
           repo: "neural-cloud-crawl",
-          path: `images/${keyword}/${subFile}/${image}`,
+          path: `image/${keyword}/${subFile}/${image}`,
           message: "Upload image",
           content: imageFile.toString("base64"),
           headers: {
