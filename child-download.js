@@ -21,20 +21,36 @@ const download = async (entity) => {
   }
 
   for (const [photoIndex, photoUrl] of entity.photoUrlList.entries()) {
-    await downloadFile(
-      photoUrl,
-      `./image/${keyword}/${entity.name}/${
-        entity.name
-      }-${photoIndex}.${photoUrl.slice(-3)}`
-    );
+    try {
+      await fs.access(
+        `./image/${keyword}/${entity.name}/${
+          entity.name
+        }-${photoIndex}.${photoUrl.slice(-3)}`
+      );
 
-    process.send({
-      type: "progress",
-      pid: process.pid,
-      entity,
-      index,
-      completed: true,
-    });
+      process.send({
+        type: "progress",
+        pid: process.pid,
+        entity,
+        index,
+        completed: true,
+      });
+    } catch (e) {
+      await downloadFile(
+        photoUrl,
+        `./image/${keyword}/${entity.name}/${
+          entity.name
+        }-${photoIndex}.${photoUrl.slice(-3)}`
+      );
+
+      process.send({
+        type: "progress",
+        pid: process.pid,
+        entity,
+        index,
+        completed: true,
+      });
+    }
   }
   process.send({ pid: process.pid, entity, index, completed: true });
 };
@@ -58,4 +74,3 @@ process.on("message", async (payload) => {
 if (process.send) {
   process.send({ type: "handshake", pid: process.pid });
 }
-

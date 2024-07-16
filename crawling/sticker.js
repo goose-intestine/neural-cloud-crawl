@@ -2,20 +2,61 @@ import fs from "node:fs/promises";
 
 import chalk from "chalk";
 import puppeteer from "puppeteer-core";
-
+import { Octokit } from "@octokit/core";
 import cliSpinners from "cli-spinners";
 import ora from "ora";
 import "dotenv/config";
 
-import characterList from "../resources/character.json";
 import { download } from "../parent-download.js";
 import { sleep } from "../utils.js";
+import { DefaultValues } from "../defaultValues.js";
 
 let browser;
 
 let browserLaunchSpinner, fetchPostSpinner, fetchImageSpinner;
 
 const searchKeyword = "表情包";
+
+// Octokit Client
+const octokit = new Octokit({
+  auth: DefaultValues.githubToken,
+});
+
+const getCharacterListResponse = await octokit.request(
+  "GET /repos/{owner}/{repo}/contents/{path}",
+  {
+    owner: "goose-intestine",
+    repo: "neural-cloud-crawl",
+    path: "resources/character.json",
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+      accept: "application/vnd.github.object+json",
+    },
+    ref: "gh-pages",
+  }
+);
+
+const characterList = JSON.parse(
+  Buffer.from(getCharacterListResponse.data.content, "base64").toString("utf-8")
+);
+
+const getEventListResponse = await octokit.request(
+  "GET /repos/{owner}/{repo}/contents/{path}",
+  {
+    owner: "goose-intestine",
+    repo: "neural-cloud-crawl",
+    path: "resources/event.json",
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+      accept: "application/vnd.github.object+json",
+    },
+    ref: "gh-pages",
+  }
+);
+
+const eventList = JSON.parse(
+  Buffer.from(getEventListResponse.data.content, "base64").toString("utf-8")
+);
 
 try {
   // const browserURL = "http://127.0.0.1:9223";
@@ -171,21 +212,34 @@ try {
         });
     });
 
-    let characterName = post.title;
+    let postName = post.title;
 
     let characterIncluded = false;
+    let eventIncluded = false;
 
     for (const character of characterList) {
       if (post.title.includes(character.name)) {
-        characterName = character.name;
+        postName = character.name;
         characterIncluded = true;
         break;
       }
     }
 
-    if (characterIncluded) {
+    for (const event of eventList) {
+      if (post.title.includes(event.story)) {
+        if (characterIncluded) {
+          postName = `${postName}-${event.story}`;
+        } else {
+          postName = event.story;
+        }
+        eventIncluded = true;
+        break;
+      }
+    }
+
+    if (characterIncluded || eventIncluded) {
       photoListToDownload.push({
-        name: characterName,
+        name: postName,
         photoUrlList: photos,
       });
     }
