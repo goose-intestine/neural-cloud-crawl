@@ -24,7 +24,7 @@ let browser;
 // });
 
 browser = await puppeteer.launch({
-  headless: false,
+  headless: true,
   ignoreDefaultArgs: ["--disable-extensions"],
 });
 
