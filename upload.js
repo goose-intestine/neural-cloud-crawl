@@ -4,15 +4,13 @@ import { Octokit } from "@octokit/core";
 import "dotenv/config";
 
 import { DefaultValues } from "./defaultValues.js";
-import { sleep } from "./utils.js";
 
 const octokit = new Octokit({
   auth: DefaultValues.githubToken,
 });
 
+// TODO: upload by child_process
 const upload = async (keyword) => {
-  const filesToPush = [];
-
   const filePath = `./images/${keyword}/`;
 
   const subFiles = await fs.readdir(filePath);
@@ -43,7 +41,7 @@ const upload = async (keyword) => {
           owner: "goose-intestine",
           repo: "neural-cloud-crawl",
           path: `images/${keyword}/${subFile}/${image}`,
-          message: "Upload image",
+          message: `Upload image ${image}`,
           content: imageFile.toString("base64"),
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",
