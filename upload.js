@@ -4,12 +4,9 @@ import chalk from "chalk";
 import cliProgress from "cli-progress";
 
 import { Octokit } from "@octokit/core";
-import cliSpinners from "cli-spinners";
-import ora from "ora";
 import "dotenv/config";
 
 import { DefaultValues } from "./defaultValues.js";
-import { sleep } from "./utils.js";
 
 const octokit = new Octokit({
   auth: DefaultValues.githubToken,
