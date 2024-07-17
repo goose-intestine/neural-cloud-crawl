@@ -12,21 +12,25 @@ const octokit = new Octokit({
   auth: DefaultValues.githubToken,
 });
 
-// create new container
-const multibar = new cliProgress.MultiBar(
-  {
-    clearOnComplete: false,
-    hideCursor: true,
-    format: `${chalk.blueBright("{bar}")} | {name} | ${chalk.yellow(
-      "{value}"
-    )}/{total}`,
-  },
-  cliProgress.Presets.rect
-);
-
 let totalFileNo = 0;
 
-const upload = async (keyword) => {
+const upload = async (keyword, headless = false) => {
+  let multibar;
+
+  if (!headless) {
+    // create new container
+    multibar = new cliProgress.MultiBar(
+      {
+        clearOnComplete: false,
+        hideCursor: true,
+        format: `${chalk.blueBright("{bar}")} | {name} | ${chalk.yellow(
+          "{value}"
+        )}/{total}`,
+      },
+      cliProgress.Presets.rect
+    );
+  }
+
   const filePath = `images/${keyword}`;
 
   const subFiles = await fs.readdir(filePath);
@@ -39,18 +43,22 @@ const upload = async (keyword) => {
     const subFilePath = `${filePath}/${subFile}`;
 
     const images = await fs.readdir(subFilePath);
-    for (const image of images) {
-      totalFileNo++;
-    }
+    totalFileNo += images.length;
   }
 
   console.log(chalk.yellow("Uploading images to Github..."));
-  let subProgressBar = multibar.create(0, 0, {
-    name: "N/A",
-  });
-  const totalProgressBar = multibar.create(totalFileNo, 0, {
-    name: "Total",
-  });
+
+  let subProgressBar;
+  let totalProgressBar;
+
+  if (!headless) {
+    subProgressBar = multibar.create(0, 0, {
+      name: "N/A",
+    });
+    totalProgressBar = multibar.create(totalFileNo, 0, {
+      name: "Total",
+    });
+  }
 
   for (const subFile of subFiles) {
     const subFilePath = `${filePath}/${subFile}`;
@@ -58,8 +66,10 @@ const upload = async (keyword) => {
     const images = await fs.readdir(subFilePath);
     const filesToPush = [];
 
-    subProgressBar.setTotal(images.length);
-    subProgressBar.update(0, { name: subFile });
+    if (!headless) {
+      subProgressBar.setTotal(images.length);
+      subProgressBar.update(0, { name: subFile });
+    }
 
     for (const image of images) {
       const imagePath = `${subFilePath}/${image}`;
@@ -84,7 +94,9 @@ const upload = async (keyword) => {
         });
       }
 
-      subProgressBar.increment();
+      if (!headless) {
+        subProgressBar.increment();
+      }
     }
 
     if (filesToPush.length > 0) {
@@ -193,12 +205,16 @@ const upload = async (keyword) => {
         },
       });
     }
-    totalProgressBar.increment(images.length);
+
+    if (!headless) {
+      totalProgressBar.increment(images.length);
+    }
   }
 
-  multibar.stop();
+  if (!headless) {
+    multibar.stop();
+  }
   console.log(chalk.green("Upload completed."));
 };
 
-await upload("表情包");
-// export { upload };
+export { upload };

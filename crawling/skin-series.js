@@ -4,6 +4,7 @@ import path, { dirname } from "node:path";
 
 import puppeteer from "puppeteer";
 import { download } from "../download-parent.js";
+import { upload } from "../upload.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -11,6 +12,8 @@ const __dirname = dirname(__filename);
 let browser;
 let skinSerieList;
 
+// TODO: seems like not full at wiki.42lab.com
+// TODO: maybe need to crawl from nga as well
 const domain = "http://wiki.42lab.cloud";
 
 try {
@@ -124,4 +127,5 @@ await fs.writeFile(`${keyword}.txt`, JSON.stringify(imagesToDownload), {
 });
 
 await download(keyword, true);
+// await upload(keyword, true);
 
