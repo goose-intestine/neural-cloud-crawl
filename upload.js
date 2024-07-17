@@ -79,11 +79,11 @@ const upload = async (keyword) => {
           ref: branch,
         });
       } catch (e) {
-        const imageFile = await fs.readFile(imagePath);
+        const imageFile = await fs.readFile(imagePath, { encoding: "base64" });
 
         filesToPush.push({
           path: `${subFilePath}/${image}`,
-          content: imageFile.toString("base64"),
+          content: imageFile,
         });
       }
 
@@ -91,6 +91,27 @@ const upload = async (keyword) => {
     }
 
     if (filesToPush.length > 0) {
+      // Function to create blobs for multiple files
+      const createBlobShas = await Promise.all(
+        filesToPush.map(async (fileToPush) => {
+          const data = await octokit.request(
+            "POST /repos/{owner}/{repo}/git/blobs",
+            {
+              owner,
+              repo,
+              content: fileToPush.content,
+              encoding: "base64",
+              headers: {
+                "X-GitHub-Api-Version": "2022-11-28",
+                accept: "application/vnd.github.object+json",
+              },
+            }
+          );
+
+          return data.data.sha;
+        })
+      );
+
       // Get the current branch reference
       const currentCommitRefResponse = await octokit.request(
         "GET /repos/{owner}/{repo}/git/ref/{ref}",
@@ -108,7 +129,7 @@ const upload = async (keyword) => {
       // console.log(currentCommitSha);
 
       // Get the sha of the root tree on the commit retrieved previously
-      const getRootTreeREsponse = await octokit.request(
+      const getRootTreeResponse = await octokit.request(
         "GET /repos/{owner}/{repo}/git/commits/{commit_sha}",
         {
           owner,
@@ -120,7 +141,7 @@ const upload = async (keyword) => {
           },
         }
       );
-      const rootTreeSha = getRootTreeREsponse.data.tree.sha;
+      const rootTreeSha = getRootTreeResponse.data.tree.sha;
       // console.log(rootTreeSha);
 
       // Create a new tree with the files
@@ -130,11 +151,11 @@ const upload = async (keyword) => {
           owner,
           repo,
           base_tree: rootTreeSha,
-          tree: filesToPush.map((file) => ({
+          tree: filesToPush.map((file, index) => ({
             path: file.path,
             mode: "100644",
             type: "blob",
-            content: file.content,
+            sha: createBlobShas[index],
           })),
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",
@@ -182,4 +203,5 @@ const upload = async (keyword) => {
   console.log(chalk.green("Upload completed."));
 };
 
-export { upload };
+await upload("表情包");
+// export { upload };
