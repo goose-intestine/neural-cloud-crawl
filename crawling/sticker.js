@@ -256,7 +256,7 @@ try {
     { encoding: "utf-8" }
   );
 
-  await download(searchKeyword);
+  await download(searchKeyword, false);
   await upload(searchKeyword);
 } catch (e) {
   console.log(` > ${chalk.redBright(`Error due to ${e} ${e.stack}`)}`);

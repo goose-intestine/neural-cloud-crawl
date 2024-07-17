@@ -15,15 +15,15 @@ const downloadFile = async (url, path) => {
 
 const download = async (entity) => {
   try {
-    await fs.access(`./image/${keyword}/${entity.name}`);
+    await fs.access(`./images/${keyword}/${entity.name}`);
   } catch (e) {
-    await fs.mkdir(`./image/${keyword}/${entity.name}`);
+    await fs.mkdir(`./images/${keyword}/${entity.name}`);
   }
 
   for (const [photoIndex, photoUrl] of entity.photoUrlList.entries()) {
     try {
       await fs.access(
-        `./image/${keyword}/${entity.name}/${
+        `./images/${keyword}/${entity.name}/${
           entity.name
         }-${photoIndex}.${photoUrl.slice(-3)}`
       );
@@ -36,12 +36,21 @@ const download = async (entity) => {
         completed: true,
       });
     } catch (e) {
-      await downloadFile(
-        photoUrl,
-        `./image/${keyword}/${entity.name}/${
-          entity.name
-        }-${photoIndex}.${photoUrl.slice(-3)}`
-      );
+      if (typeof photoUrl !== "object") {
+        await downloadFile(
+          photoUrl,
+          `./images/${keyword}/${entity.name}/${
+            entity.name
+          }-${photoIndex}.${photoUrl.slice(-3)}`
+        );
+      } else {
+        await downloadFile(
+          photoUrl.url,
+          `./images/${keyword}/${entity.name}/${
+            photoUrl.name
+          }.${photoUrl.url.slice(-3)}`
+        );
+      }
 
       process.send({
         type: "progress",
