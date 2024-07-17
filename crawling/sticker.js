@@ -8,6 +8,7 @@ import ora from "ora";
 import "dotenv/config";
 
 import { download } from "../download-parent.js";
+import { upload } from "../upload.js";
 import { sleep } from "../utils.js";
 import { DefaultValues } from "../defaultValues.js";
 
@@ -256,6 +257,7 @@ try {
   );
 
   await download(searchKeyword);
+  await upload(searchKeyword);
 } catch (e) {
   console.log(` > ${chalk.redBright(`Error due to ${e} ${e.stack}`)}`);
   await browser.close();

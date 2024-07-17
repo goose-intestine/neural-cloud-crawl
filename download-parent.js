@@ -51,7 +51,7 @@ const download = async (keyword) => {
     if (i >= entityList.length) {
       break;
     }
-    
+
     barList.push(
       multibar.create(entityList[i].photoUrlList.length, 0, {
         name: entityList[i].name,
@@ -116,12 +116,10 @@ const download = async (keyword) => {
   }
   const checkResultList = setInterval(() => {
     if (!resultList.includes(false)) {
-      console.log(chalk.yellow("\nDownload complete."));
+      console.log(chalk.green("\nDownload completed."));
 
       multibar.stop();
       clearInterval(checkResultList);
-
-      process.exit();
     }
   }, 500);
 
