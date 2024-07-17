@@ -1,6 +1,6 @@
+import fs from "node:fs/promises";
 import { fork } from "node:child_process";
 import os from "node:os";
-import fs from "node:fs/promises";
 
 import chalk from "chalk";
 import cliProgress from "cli-progress";
@@ -48,6 +48,10 @@ const download = async (keyword) => {
   const barIndexMap = [];
 
   for (let i = 0; i < numCPUs; i++) {
+    if (i >= entityList.length) {
+      break;
+    }
+    
     barList.push(
       multibar.create(entityList[i].photoUrlList.length, 0, {
         name: entityList[i].name,
@@ -62,7 +66,7 @@ const download = async (keyword) => {
       break;
     }
 
-    const forked = fork("child-download.js");
+    const forked = fork("download-child.js");
 
     forked.on("message", (msg) => {
       let barIndex;

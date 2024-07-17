@@ -7,7 +7,7 @@ import cliSpinners from "cli-spinners";
 import ora from "ora";
 import "dotenv/config";
 
-import { download } from "../parent-download.js";
+import { download } from "../download-parent.js";
 import { sleep } from "../utils.js";
 import { DefaultValues } from "../defaultValues.js";
 
