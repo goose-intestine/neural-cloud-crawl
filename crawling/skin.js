@@ -143,18 +143,6 @@ await fs.writeFile(
 
 const keyword = "心智投影";
 
-const indexPath = path.join(__dirname, `../index`);
-
-try {
-  await fs.access(indexPath);
-} catch (e) {
-  await fs.mkdir(indexPath);
-}
-
-await fs.writeFile(
-  `${indexPath}/${keyword}.txt`,
-  JSON.stringify(allSkinSortByTheme),
-  {
-    encoding: "utf-8",
-  }
-);
+await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
+  encoding: "utf-8",
+});

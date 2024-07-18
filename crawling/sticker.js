@@ -253,16 +253,8 @@ try {
 
   await browser.close();
 
-  const indexPath = path.join(__dirname, `../index`);
-
-  try {
-    await fs.access(indexPath);
-  } catch (e) {
-    await fs.mkdir(indexPath);
-  }
-
   await fs.writeFile(
-    `${indexPath}/${searchKeyword}.txt`,
+    `${searchKeyword}.txt`,
     JSON.stringify(photoListToDownload),
     {
       encoding: "utf-8",
