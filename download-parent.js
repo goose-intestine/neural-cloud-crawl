@@ -47,7 +47,7 @@ const download = async (keyword, headless = false) => {
     await fs.mkdir(`./images/${keyword}`);
   }
 
-  const barList = [];
+  const barList = new Array(numCPUs).fill(null);
   const barIndexMap = [];
 
   if (!headless) {
@@ -56,11 +56,9 @@ const download = async (keyword, headless = false) => {
         break;
       }
 
-      barList.push(
-        multibar.create(entityList[i].photoUrlList.length, 0, {
-          name: entityList[i].name,
-        })
-      );
+      barList[i] = multibar.create(entityList[i].photoUrlList.length, 0, {
+        name: entityList[i].name,
+      });
 
       barIndexMap[i] = i;
     }
@@ -73,7 +71,7 @@ const download = async (keyword, headless = false) => {
 
     const forked = fork("download-child.js");
 
-    forked.on("message", (msg) => {
+    forked.on("message", async (msg) => {
       let barIndex;
 
       if (Object.prototype.hasOwnProperty.call(msg, "index") && !headless) {
@@ -90,7 +88,7 @@ const download = async (keyword, headless = false) => {
           entity: entityList[index],
           index,
         });
-        index++;
+        index += 1;
         return;
       }
 
@@ -109,16 +107,19 @@ const download = async (keyword, headless = false) => {
         }
         if (!headless) {
           // Update bar's info
-          barList[barIndex].update(0, {
+          await barList[barIndex].update(0, {
             name: entityList[index].name,
           });
-          barList[barIndex].setTotal(entityList[index].photoUrlList.length);
+          await barList[barIndex].setTotal(
+            entityList[index].photoUrlList.length
+          );
+
           barIndexMap[barIndex] = index;
         }
       }
 
       forked.send({ pid: msg.pid, entity: entityList[index], index });
-      index++;
+      index += 1;
       return;
     });
 

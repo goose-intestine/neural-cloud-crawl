@@ -1,3 +1,6 @@
-import { download } from "./parent-download.js";
+import { download } from "./download-parent.js";
+import { upload } from "./upload.js";
 
-await download("表情包");
+await download("心智投影", false);
+
+await upload("心智投影", false);
