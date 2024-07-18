@@ -40,14 +40,12 @@ jobs:
           retention-days: 14
           path: |
             resources/*
-            index/*
 
       - name: Update resources
         uses: test-room-7/action-update-file@v1
         with:
           file-path: |
             resources/*
-            index/*
           commit-msg: Update resources
           github-token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
