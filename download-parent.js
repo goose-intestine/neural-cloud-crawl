@@ -108,6 +108,7 @@ const download = async (keyword, headless = false) => {
           return;
         }
         if (!headless) {
+          // Update bar's info
           barList[barIndex].update(0, {
             name: entityList[index].name,
           });

@@ -36,6 +36,7 @@ const download = async (entity) => {
         completed: true,
       });
     } catch (e) {
+      // set custom file name if type = object
       if (typeof photoUrl !== "object") {
         await downloadFile(
           photoUrl,

@@ -116,6 +116,7 @@ try {
 
   const postList = [];
 
+  // Fetch search result pages
   const searchResultUrls = await page2.evaluate(() => {
     const searchPages = Array.from(document.querySelectorAll("#pagebbtm a"));
 
@@ -126,6 +127,7 @@ try {
     ].filter((link) => !link.includes("javascript:void(0)"));
   });
 
+  // Fetch post's url
   for (const navLink of searchResultUrls) {
     if (page2.url() !== `${domain}${navLink}`) {
       await page2.goto(`${domain}${navLink}`);
@@ -188,6 +190,7 @@ try {
   //   photoUrlList: photos,
   // });
 
+  // Fetch image's urls from posts
   fetchImageSpinner = ora({
     text: chalk.yellow("Fetching image's url..."),
     spinner: cliSpinners.circleHalves,
