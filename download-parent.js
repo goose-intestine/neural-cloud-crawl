@@ -109,9 +109,9 @@ const download = async (keyword, headless = false) => {
         }
         if (!headless) {
           barList[barIndex].update(0, {
-            total: entityList[index].photoUrlList.length,
             name: entityList[index].name,
           });
+          barList[barIndex].setTotal(entityList[index].photoUrlList.length);
           barIndexMap[barIndex] = index;
         }
       }

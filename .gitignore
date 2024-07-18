@@ -1,7 +1,7 @@
 node_modules
 images
 temp
-# resources
+resources
 
 .env
 *.txt
