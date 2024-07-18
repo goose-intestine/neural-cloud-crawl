@@ -138,16 +138,13 @@ try {
   await fs.mkdir(directoryPath);
 }
 
-const keyword = "心智投影";
-
-await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
-  encoding: "utf-8",
-});
-
 await fs.writeFile(
   `${directoryPath}/skinTheme.json`,
   JSON.stringify(skinThemeList)
 );
 
-await download(keyword, false);
+const keyword = "心智投影";
 
+await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
+  encoding: "utf-8",
+});

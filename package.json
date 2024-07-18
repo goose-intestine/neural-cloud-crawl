@@ -6,6 +6,7 @@
     "sticker": "node ./crawling/sticker.js",
     "character": "node ./crawling/character.js",
     "event": "node ./crawling/event.js",
+    "skin": "node ./crawling/skin.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
