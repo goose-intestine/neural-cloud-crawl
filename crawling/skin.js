@@ -138,7 +138,7 @@ try {
   await fs.mkdir(directoryPath);
 }
 
-const keyword = "心智投影";s
+const keyword = "心智投影";
 
 await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
   encoding: "utf-8",
