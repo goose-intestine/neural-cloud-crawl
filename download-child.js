@@ -6,11 +6,15 @@ let index;
 let keyword;
 
 const downloadFile = async (url, path) => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  const arrayBuffer = await blob.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  await fs.writeFile(path, buffer);
+  try {
+    await fs.access(path);
+  } catch (e) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    await fs.writeFile(path, buffer);
+  }
 };
 
 const download = async (entity) => {
