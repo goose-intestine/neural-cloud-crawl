@@ -5,8 +5,6 @@ import path, { dirname } from "node:path";
 import puppeteer from "puppeteer";
 import { Octokit } from "@octokit/core";
 
-import { download } from "../download-parent.js";
-import { upload } from "../upload.js";
 import { DefaultValues } from "../defaultValues.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -145,6 +143,18 @@ await fs.writeFile(
 
 const keyword = "心智投影";
 
-await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
-  encoding: "utf-8",
-});
+const indexPath = path.join(__dirname, `../index`);
+
+try {
+  await fs.access(indexPath);
+} catch (e) {
+  await fs.mkdir(indexPath);
+}
+
+await fs.writeFile(
+  `${indexPath}/${keyword}.txt`,
+  JSON.stringify(allSkinSortByTheme),
+  {
+    encoding: "utf-8",
+  }
+);

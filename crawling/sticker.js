@@ -253,10 +253,20 @@ try {
 
   await browser.close();
 
+  const indexPath = path.join(__dirname, `../index`);
+
+  try {
+    await fs.access(indexPath);
+  } catch (e) {
+    await fs.mkdir(indexPath);
+  }
+
   await fs.writeFile(
-    `${searchKeyword}.txt`,
+    `${indexPath}/${searchKeyword}.txt`,
     JSON.stringify(photoListToDownload),
-    { encoding: "utf-8" }
+    {
+      encoding: "utf-8",
+    }
   );
 
   await download(searchKeyword, false);
