@@ -136,7 +136,6 @@ const download = async (keyword, headless = false) => {
       console.log(chalk.green("Download completed."));
 
       clearInterval(checkResultList);
-      process.exit();
     }
   }, 500);
 
