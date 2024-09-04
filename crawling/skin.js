@@ -136,13 +136,15 @@ try {
   await fs.mkdir(directoryPath);
 }
 
-await fs.writeFile(
-  `${directoryPath}/skinTheme.json`,
-  JSON.stringify(skinThemeList)
-);
+if (skinThemeList.length > 0) {
+  await fs.writeFile(
+    `${directoryPath}/skinTheme.json`,
+    JSON.stringify(skinThemeList)
+  );
 
-const keyword = "心智投影";
+  const keyword = "心智投影";
 
-await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
-  encoding: "utf-8",
-});
+  await fs.writeFile(`${keyword}.txt`, JSON.stringify(allSkinSortByTheme), {
+    encoding: "utf-8",
+  });
+}
