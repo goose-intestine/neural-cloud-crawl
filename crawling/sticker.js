@@ -261,8 +261,9 @@ try {
     }
   );
 
-  await download(searchKeyword, false);
-  await upload(searchKeyword);
+  await download(searchKeyword, false, async () => {
+    await upload(searchKeyword);
+  });
 } catch (e) {
   console.log(` > ${chalk.redBright(`Error due to ${e} ${e.stack}`)}`);
   await browser.close();

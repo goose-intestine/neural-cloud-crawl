@@ -7,7 +7,7 @@ import cliProgress from "cli-progress";
 
 const numCPUs = os.cpus().length;
 
-const download = async (keyword, headless = false) => {
+const download = async (keyword, headless = false, callBack) => {
   let multibar;
   if (!headless) {
     // create new container
@@ -134,6 +134,10 @@ const download = async (keyword, headless = false) => {
       }
 
       console.log(chalk.green("Download completed."));
+
+      if (callBack) {
+        callBack();
+      }
 
       clearInterval(checkResultList);
     }

@@ -215,6 +215,7 @@ const upload = async (keyword, headless = false) => {
     multibar.stop();
   }
   console.log(chalk.green("Upload completed."));
+  return;
 };
 
 export { upload };
