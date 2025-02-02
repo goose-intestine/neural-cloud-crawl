@@ -33,9 +33,7 @@ const page1 = await browser.newPage();
 await page1.setViewport({ width: 800, height: 800 });
 
 // Navigate the page to a URL.
-await page1.goto(
-  "http://wiki.42lab.cloud/w/%E5%BF%83%E6%99%BA%E4%BA%BA%E5%BD%A2%E5%9B%BE%E9%89%B4"
-);
+await page1.goto("http://wiki.42lab.cloud/w/心智人形图鉴");
 
 await page1.evaluate(() => {
   const selectElem = document.querySelector("#per-page");
@@ -90,4 +88,3 @@ await fs.writeFile(
   `${directoryPath}/character.json`,
   JSON.stringify(characterList)
 );
-
