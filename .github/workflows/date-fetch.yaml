@@ -2,8 +2,6 @@ name: Neural Cloud Wiki - Data Crawling
 
 on: 
   push:
-  schedule:
-    - cron: "0 16 * * *"
   workflow_dispatch:
 
 env:
