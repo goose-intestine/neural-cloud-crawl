@@ -34,7 +34,7 @@ jobs:
           node ./crawling/skin.js
 
       - name: Archive crawled outputs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Crawled Files
